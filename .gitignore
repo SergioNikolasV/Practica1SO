@@ -1,0 +1,4 @@
+# Posibles variables de entorno
+
+.env
+.env.local
