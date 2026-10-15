@@ -5,9 +5,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 #include "shm_comun.h"
+#include <semaphore.h>
+#include <errno.h>
+#include <ctype.h>
 
-void fullfitdata(Compartido *p) {
+
+void fullfit_data(Compartido *p) {
     p->tipo_solicitud = 1;
     snprintf(p->par1, sizeof(p->par1), "Parametro 1");
     snprintf(p->par2, sizeof(p->par2), "Parametro 2");
@@ -17,7 +23,24 @@ void fullfitdata(Compartido *p) {
     p->cod_error = 0;
 }
 
+void delete_names(void) {
+    sem_unlink(NOMBRE_REQ);
+    sem_unlink(NOMBRE_RESP);
+    shm_unlink(NOMBRE_SHM);
+}
+
+static int waiting(sem_t *s) {
+    while (sem_wait(s) == -1) {
+        if (errno != EINTR) {
+            perror("sem_wait");
+            return -1;
+        }
+    }
+    return 0;
+}
+
 int main(void) {
+    //delete_names(); Por si hago algo imbecil 
 
     int fd = shm_open(NOMBRE_SHM, O_CREAT | O_EXCL | O_RDWR, 0600);
     if (fd == -1) {
@@ -41,13 +64,31 @@ int main(void) {
     }
 
     close(fd);
-    fullfitdata(p);
+    fullfit_data(p);
 
-    printf(" Servidor iniciado con PID: %d, orpima cualquier tecla para concluir...\n", getpid());
-    getchar();
+    printf(" Servidor iniciado con PID: %d, esperando solicitudes...\n", getpid());
+    // getchar(); Esto se usaba antes del semaforo
+
+    sem_t *sem_req = sem_open(NOMBRE_REQ, O_CREAT, 0600, 0);
+    sem_t *sem_res = sem_open(NOMBRE_RESP, O_CREAT, 0600, 0);
+    if (sem_req == SEM_FAILED || sem_res == SEM_FAILED) {
+        perror("sem_open");
+        munmap(p, sizeof(Compartido));
+        shm_unlink(NOMBRE_SHM);
+        return EXIT_FAILURE;
+    }
+
+    for (;;) {
+        if (waiting(sem_req) == -1) break;
+        if (p->state == 2) break;
+
+        printf("[servidor] recibí:    %s\n", p->par1);
+        snprintf(p->reg, sizeof(p->reg), "%s%s", "Este mensaje es una mierda: ", p->par1);
+        sem_post(sem_res);
+    }
 
     munmap(p, sizeof(Compartido));
-    shm_unlink(NOMBRE_SHM);
+    delete_names();
 
     return 0;
 }
