@@ -2,3 +2,7 @@
 
 .env
 .env.local
+
+/src/memoria/shm_client
+/src/memoria/shm_server
+/src/memoria/s.txt
