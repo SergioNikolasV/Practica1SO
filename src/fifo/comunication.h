@@ -37,10 +37,6 @@ static ssize_t read_full(int fd, void *buffer, size_t size) {
     while (total < size) {
         ssize_t n = read(fd, p + total, size - total);
         if (n == 0) return (ssize_t)total;
-        if (n == -1) {
-            if (errno == EINTR) continue;
-            return -1;
-        }
         total += (size_t)n;
     }
 
@@ -53,10 +49,6 @@ static ssize_t write_full(int fd, const void *buffer, size_t size) {
 
     while (total < size) {
         ssize_t n = write(fd, p + total, size - total);
-        if (n == -1) {
-            if (errno == EINTR) continue;
-            return -1;
-        }
         total += (size_t)n;
     }
 

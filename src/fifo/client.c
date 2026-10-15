@@ -38,7 +38,11 @@ int main(void) {
     }
 
     int flags = fcntl(req_fd, F_GETFL);
-    if (flags != -1) fcntl(req_fd, F_SETFL, flags & ~O_NONBLOCK);
+    if (flags == -1 || fcntl(req_fd, F_SETFL, flags & ~O_NONBLOCK) == -1) {
+        perror("Error configurando FIFO de solicitudes");
+        close(req_fd);
+        return 1;
+    }
 
     int resp_fd = open(FIFO_RESPONSE, O_RDONLY);
     if (resp_fd == -1) {
