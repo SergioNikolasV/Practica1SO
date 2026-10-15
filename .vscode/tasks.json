@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Compilar servidor SHM",
+			"type": "shell",
+			"command": "sh",
+			"args": [
+				"-c",
+				"rm -f src/memoria/shm_server.tmp && gcc -std=c11 -Wall -Wextra -Werror -pedantic -g src/memoria/shm_server.c src/comun/search.c -o src/memoria/shm_server.tmp -pthread -lrt && mv -f src/memoria/shm_server.tmp src/memoria/shm_server"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
