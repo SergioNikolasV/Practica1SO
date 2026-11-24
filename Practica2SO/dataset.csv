@@ -1,0 +1,22 @@
+column,type,description
+track_id,string,Unique track id
+genre,string,pop / hiphop / edm / rock / latin / rnb / country / indie
+energy,float,AUDIO: energy (0-10)
+valence,float,AUDIO: positivity/valence (0-10)
+danceability,float,AUDIO: danceability (0-10)
+acousticness,float,AUDIO: acousticness (0-10)
+instrumentalness,float,AUDIO: instrumentalness (0-10)
+tempo_bpm,int,AUDIO: tempo (BPM)
+song_length_sec,int,AUDIO: track length (seconds)
+label_tier,string,DISTRIBUTION: major / indie_label / independent
+marketing_budget,float,"DISTRIBUTION: marketing spend (0-12, relative)"
+playlist_adds_first_month,int,DISTRIBUTION: playlist additions in the first month
+editorial_playlist,int,DISTRIBUTION: 1 if placed on a big curated/editorial playlist
+tiktok_virality,float,DISTRIBUTION: TikTok virality (0-15) — exogenous spike source
+artist_prior_monthly_listeners,float,DISTRIBUTION: artist audience before release
+featured_artist,int,1 if a featured (collab) artist
+first_month_streams,int,Streams in the first month (early momentum — Matthew seed)
+halflife_days,int,Days spent above 50% of peak popularity (decay speed)
+streams_3yr,int,TARGET (regression): total streams after 3 years (heavy-tailed)
+slow_burner,int,TARGET (binary): 1 if half-life > 150 days (a lasting hit)
+is_hit,int,TARGET (binary): 1 if top-10% by 3-year streams
